@@ -1,0 +1,36 @@
+import requests
+import json
+import uuid
+import csv
+from data_csv import*
+import threading
+
+stop_event = threading.Event()
+def push_server():
+    #------- sent request server--------------------------
+    get_api = 'http://192.168.1.8:8080/device/device/device?roomId=AF3C4F1AAB' 
+    put_api = 'http://192.168.1.8:8080/device/device/device'
+    roomId =hex(uuid.getnode()) # get MAC ADDRESS
+    roomId =(str)(roomId)[2:]
+    #print (roomId)
+    roomNo = '1201'
+    roomName = 'RD center'
+    place = 'A1'
+    roomStatus = '1'
+    roomPerson ='1'
+    data_put = {'id':roomId, 'roomNo': roomNo,'roomName':roomName ,'place':place,'roomStatus':roomStatus, 'roomPerson':roomPerson}
+    #data_put['id'] = roomId
+    #data_send = json.loads(data_put) # json to python
+    #data_send = json.dumps(data_put) # python to json
+    print(data_put)
+    response = requests.put(put_api,json = data_put)  ## PUT service
+    print(response)
+    
+    #print('reponse code:',response.status_code)
+    get_response = requests.get(get_api)		# GET service
+    print(get_response)
+    print(get_response.json())
+    writer_csv('Database.csv',get_response.json()) # write data to csv file
+
+if __name__ == '__main__':
+    push_server()

@@ -1,0 +1,42 @@
+#test đa luồng thử xem có chạy được không
+import threading
+import cv2
+import time
+
+# Biến điều khiển luồng
+stop_event = threading.Event()
+
+def detect_person():
+    cap = cv2.VideoCapture(0)
+    while not stop_event.is_set():
+        ret, frame = cap.read()
+        if ret:
+            # Thực hiện nhận diện người tại đây
+            cv2.imshow('Frame', frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    cap.release()
+    cv2.destroyAllWindows()
+
+def read_rfid():
+    cnt = 0
+    while not stop_event.is_set():
+        # Thực hiện đọc RFID tại đây
+        time.sleep(1)  # Giả sử việc đọc RFID mất 1 giây
+        print("RFID read {}".format(cnt))
+        cnt += 1
+
+if __name__ == "__main__":
+    # Tạo và khởi chạy luồng
+    person_thread = threading.Thread(target=detect_person)
+    rfid_thread = threading.Thread(target=read_rfid)
+
+    person_thread.start()
+    rfid_thread.start()
+
+    # Đợi một khoảng thời gian rồi dừng tất cả luồng
+    time.sleep(10)
+    #stop_event.set()
+
+    person_thread.join()
+    rfid_thread.join()
